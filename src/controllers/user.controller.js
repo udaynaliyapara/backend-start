@@ -7,7 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const registerUser = asyncHandler(async (req, res) => {
   // get user details from frontend
   // validation - not empty
-  // check if user already exists: username, email
+  // check if user already exists: userName, email
   // check for images, check for avatar
   // upload them to cloudinary, avatar
   // create user object - create entry in db
@@ -15,20 +15,20 @@ const registerUser = asyncHandler(async (req, res) => {
   // check for user creation
   // return res
 
-  const { fullName, email, username, password } = req.body;
+  const { fullName, email, userName, password } = req.body;
 
   if (
-    [fullName, email, username, password].some((field) => field?.trim() === "")
+    [fullName, email, userName, password].some((field) => field?.trim() === "")
   ) {
     throw new ApiError(400, "All fields are required");
   }
 
   const existedUser = await User.findOne({
-    $or: [{ username }, { email }],
+    $or: [{ userName }, { email }],
   });
 
   if (existedUser) {
-    throw new ApiError(409, "User with email or username already exists");
+    throw new ApiError(409, "User with email or userName already exists");
   }
 
   const avatarLocalPath = req.files?.avatar[0]?.path;
@@ -60,7 +60,7 @@ const registerUser = asyncHandler(async (req, res) => {
     coverImage: coverImage?.url || "",
     email,
     password,
-    username: username.toLowerCase(),
+    userName: userName.toLowerCase(),
   });
 
   const createdUser = await User.findById(user._id).select(
